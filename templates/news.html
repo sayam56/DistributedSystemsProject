@@ -1,22 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Homepage{% endblock %}
+{% block title %}News{% endblock %}
 
 {% block content %}
-<h2>This is our Homepage</h2>
+<h2>This is our News page</h2>
 <div class="navigation">
     <ul>
       <!--
+        <li><a href="{% url 'stockapp:homepage' %}">Team Detail</a></li>
         <li><a href="{% url 'stockapp:aboutus' %}">About Us</a></li>
         <li><a href="{% url 'stockapp:stock_search' %}">Search</a></li>
         <li><a href="{% url 'stockapp:news' %}">Team Detail</a></li>
+        <li><a href="{% url 'stockapp:predict' %}">Team Detail</a></li>
         <li><a href="{% url 'accounts:members' %}">Team Detail</a></li>
         -->
     </ul>
 </div>
-<div class="stock-images">
+<div class="news-images">
   <!--
-    <img src="{% static 'stocks.jpg' %}" alt="Image of Stocks">
+    <img src="{% static 'news.jpg' %}" alt="Image of Stocks">
     -->
 </div>
 {% endblock %}
