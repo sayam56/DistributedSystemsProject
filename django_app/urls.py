@@ -1,5 +1,5 @@
 """
-URL configuration for django_project project.
+URL configuration for carsite project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -14,12 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+
+from . import views
+
+app_name = 'django_app'
 
 urlpatterns = [
-    path('', include('django_app.urls', namespace='django_app')),
-    path("admin/", admin.site.urls),
-    path("accounts/", include("accounts.urls")),
-    path("accounts/", include("django.contrib.auth.urls")),
+    # path('load_template/<str:template_id>', views.load_template, name='load_template'),
+    path('', views.homepage, name='homepage'),
+    # path('template1', views.temp1, name='template1'),
+    # path('template2', views.temp2, name='template2'),
+    # path('template3', views.temp3, name='template3'),
+    # path('template1editor', views.temp1edit, name='template1editor'),
+    # path('login/', views.login_here, name='login'),
+    # path('logout/', views.logout_here, name='logout'),
 ]
