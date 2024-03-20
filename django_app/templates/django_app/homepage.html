@@ -10,17 +10,17 @@
 {#            <img src="{% static 'images/logo.png' %}" alt="Bytebuster Logo">#}
         </div>
 
-{#        {% if user.is_authenticated %}#}
-{#            Welcome - {{ user.username }}!#}
+        {% if user.is_authenticated %}
+            Welcome - {{ user.username }}!
             {#    <p><a href="{% url 'password_change' %}">Password Change</a></p>#}
-{#            <form action="{% url 'logout' %}" method="post">#}
-{#              {% csrf_token %}#}
-{#              <button type="submit" class="login-button">Log Out</button>#}
-{#            </form>#}
+            <form action="{% url 'logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="login-button">Log Out</button>
+            </form>
 {#            <a href="{% url 'login' %}" class="login-button">Log Out</a>#}
-{#        {% else %}#}
-{#            <a href="{% url 'login' %}" class="login-button">Log In</a>#}
-{#        {% endif %}#}
+        {% else %}
+            <a href="{% url 'login' %}" class="login-button">Log In</a>
+        {% endif %}
     </nav>
 
     <div class="content">
