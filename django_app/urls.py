@@ -29,5 +29,5 @@ urlpatterns = [
     # path('template1editor', views.temp1edit, name='template1editor'),
     # path('login/', views.login_here, name='login'),
     # path('logout/', views.logout_here, name='logout'),
-    path('',views.predict, name='predict')
+    path('predict',views.predict, name='predict'),
 ]
