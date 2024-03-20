@@ -8,25 +8,20 @@
 <div class="navigation">
     <ul>
 
-        <li><a href="{% url 'stockapp:homepage' %}">Team Detail</a></li>
-        <li><a href="{% url 'stockapp:aboutus' %}">About Us</a></li>
-        <li><a href="{% url 'stockapp:stock_search' %}">Search</a></li>
-        <li><a href="{% url 'stockapp:news' %}">Team Detail</a></li>
-        <li><a href="{% url 'stockapp:predict' %}">Team Detail</a></li>
-        <li><a href="{% url 'accounts:members' %}">Team Detail</a></li>
+
 
     </ul>
 </div>
     -->
     <div class="container">
         <header>
-            <!-- Your navigation and header content here -->
+            <!--  navigation and header content here -->
         </header>
 
         <section class="stock-information">
             <h2>Information</h2>
             <table>
-                <!-- Replace with dynamic content from your Django context -->
+                <!-- Replace with dynamic content from Django context -->
                 <tr>
                     <th>Symbol</th>
                     <td>{{ stock.symbol }}</td>
@@ -53,17 +48,17 @@
         </section>
 
         <footer>
-            <!-- Your footer content here -->
+            <!-- footer content here -->
         </footer>
     </div>
 
     <script>
-        // Add your JavaScript here, you might have JS to initialize charts or handle user events
+        // Add JavaScript here, you might have JS to initialize charts or handle user events
         var liveChartContext = document.getElementById('live-chart').getContext('2d');
         var predictionChartContext = document.getElementById('prediction-chart').getContext('2d');
         // Assume 'liveChartData' and 'predictionChartData' are passed from Django context
 
-        // Example initialization (you would replace this with your actual data and options)
+        // Example initialization ( replace this with actual data and options)
         var liveChart = new Chart(liveChartContext, {
             type: 'line',
             data: liveChartData,
@@ -79,7 +74,7 @@
 
     <div class="predict-images">
       <!--
-        <img src="{% static 'predict.jpg' %}" alt="Image of Stocks">
+
         -->
     </div>
 {% endblock %}

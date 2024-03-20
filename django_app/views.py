@@ -28,3 +28,6 @@ def homepage(request):
 #     template_name = 'ByteBusterApp/' + template_id + '.html'
 #     html = render_to_string(template_name, request=request)
 #     return HttpResponse(html)
+
+def predict(request):
+    return render(request, 'django_app/predict.html')
