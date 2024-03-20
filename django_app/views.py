@@ -4,8 +4,14 @@ from django.template.loader import render_to_string
 
 
 # Create your views here.
-def homepage(request):
-    return render(request, 'django_app/homepage.html')
+
+# The Home page when Server loads up
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+
+# def homepage(request):
+#     return render(request, 'django_app/homepage.html')
 
 #
 # def temp1(request):
