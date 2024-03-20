@@ -65,10 +65,38 @@ def dashboard(request):
 
     plot_div_left = plot(fig_left, auto_open=False, output_type='div')
 
+    # ================================================ To show recent stocks ==============================================
+
+    df1 = yf.download(tickers='AAPL', period='1d', interval='1d')
+    df2 = yf.download(tickers='AMZN', period='1d', interval='1d')
+    df3 = yf.download(tickers='GOOGL', period='1d', interval='1d')
+    df4 = yf.download(tickers='UBER', period='1d', interval='1d')
+    df5 = yf.download(tickers='TSLA', period='1d', interval='1d')
+    df6 = yf.download(tickers='TWTR', period='1d', interval='1d')
+
+    df1.insert(0, "Ticker", "AAPL")
+    df2.insert(0, "Ticker", "AMZN")
+    df3.insert(0, "Ticker", "GOOGL")
+    df4.insert(0, "Ticker", "UBER")
+    df5.insert(0, "Ticker", "TSLA")
+    df6.insert(0, "Ticker", "TWTR")
+
+    df = pd.concat([df1, df2, df3, df4, df5, df6], axis=0)
+    df.reset_index(level=0, inplace=True)
+    df.columns = ['Date', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Adj_Close', 'Volume']
+    convert_dict = {'Date': object}
+    df = df.astype(convert_dict)
+    df.drop('Date', axis=1, inplace=True)
+
+    json_records = df.reset_index().to_json(orient='records')
+    recent_stocks = []
+    recent_stocks = json.loads(json_records)
+
     # ========================================== Page Render section =====================================================
 
     return render(request, 'dashboard.html', {
         'plot_div_left': plot_div_left,
+        'recent_stocks': recent_stocks
     })
 
 # def homepage(request):

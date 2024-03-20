@@ -77,7 +77,35 @@
                             <a href="https://finance.yahoo.com/trending-tickers" target="_blank">Show All</a>
                         </div>
                         <div class="table-responsive">
-                            <!-- Recent stocks data will go here -->
+                            <!-- Recent stocks data here-->
+                            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                                <thead>
+                                    <tr class="text-white">
+                                        <th scope="col">Stock</th>
+                                        <th scope="col">Open</th>
+                                        <th scope="col">High</th>
+                                        <th scope="col">Low</th>
+                                        <th scope="col">Close</th>
+                                        <th scope="col">Adj. Close</th>
+                                        <th scope="col">Volume</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if recent_stocks %}
+                                    {% for i in recent_stocks %}
+                                    <tr>
+                                        <td>{{i.Ticker}}</td>
+                                        <td>{{i.Open}}</td>
+                                        <td>{{i.High}}</td>
+                                        <td>{{i.Low}}</td>
+                                        <td>{{i.Close}}</td>
+                                        <td>{{i.Adj_Close}}</td>
+                                        <td>{{i.Volume}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
             </div>
