@@ -7,9 +7,10 @@
     <div class="signup-container center-screen">
         <h2 class="welcomeHeader">Welcome!</h2>
         <h3 class="titleHeader">Sign Up</h3>
-        <form method="post" class="login-form">
+        <form method="post" class="login-form" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form }}
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
             <a href="{% url 'password_reset' %}" class="forgotPass">Forgot Password?</a>
             <button type="submit" class="btn btn-success btn-block signup-btn">Sign Up</button>
 
