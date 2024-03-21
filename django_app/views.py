@@ -1,6 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template.loader import render_to_string
-
+from django.urls import reverse_lazy, reverse
 from urllib import request
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -17,7 +17,6 @@ import json
 
 import yfinance as yf
 import datetime as dt
-import qrcode
 
 
 # Create your views here.
@@ -98,3 +97,27 @@ def dashboard(request):
         'plot_div_left': plot_div_left,
         'recent_stocks': recent_stocks
     })
+
+
+def predict(request):
+    response = HttpResponse()
+    heading1 = '<p>' + 'PREDICT PAGE:' + '</p>'
+    response.write(heading1)
+
+    return response
+
+
+def stockInfo(request):
+    response = HttpResponse()
+    heading1 = '<p>' + 'Stock INFo PAGE:' + '</p>'
+    response.write(heading1)
+
+    return response
+
+
+def news(request):
+    response = HttpResponse()
+    heading1 = '<p>' + 'NEWS PAGE:' + '</p>'
+    response.write(heading1)
+
+    return response

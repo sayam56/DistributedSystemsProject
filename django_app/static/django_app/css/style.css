@@ -5,6 +5,10 @@
     --dark: #000000;
 }
 
+.icon-color{
+    color: var(--primary) !important;
+}
+
 
 /*** Spinner ***/
 #spinner {
@@ -149,6 +153,7 @@
 .sidebar .navbar .dropdown-item:hover,
 .sidebar .navbar .dropdown-item.active {
     background: var(--dark);
+    color: var(--primary);
 }
 
 .content .navbar .navbar-nav .nav-link {
@@ -181,6 +186,7 @@
 .content .navbar .dropdown-item:hover,
 .content .navbar .dropdown-item.active {
     background: var(--dark);
+    color: var(--primary);
 }
 
 .content .navbar .dropdown-toggle::after {
