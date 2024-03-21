@@ -3,10 +3,29 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<h2>Log In</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form }}
-  <button type="submit">Log In</button>
-</form>
+    <div class="bg-image"></div>
+    <div class="login-container center-screen">
+        <h2 class="welcomeHeader">Welcome!</h2>
+        <h3 class="titleHeader">Login</h3>
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            {{ form }}
+            <div class="leftRight">
+                <div class="form-check left">
+                    <input type="checkbox" class="form-check-input" id="keepSignedIn">
+                    <label class="form-check-label" for="keepSignedIn">Keep me signed in</label>
+                </div>
+                <a href="{% url 'password_reset' %}" class="forgotPass">Forgot Password?</a><br/>
+            </div>
+            <button type="submit" class="btn btn-success btn-block">Login</button>
+
+            <div class="modalBottom">
+                Don't have an Account?
+                <a href="{% url 'signup' %}">Sign Up</a>
+            </div>
+
+        </form>
+    </div>
+
+
 {% endblock %}
