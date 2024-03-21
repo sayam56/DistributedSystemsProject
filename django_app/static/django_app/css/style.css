@@ -20,6 +20,21 @@
     opacity: 1;
 }
 
+.show-all-button {
+    color: #191C24;
+    font-weight: bold;
+    background-color: #4ADE80;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.show-all-button:hover {
+    transform: scale(1.1);
+    color: #191C24;
+    font-weight: bolder;
+}
+
 
 /*** Layout ***/
 .sidebar {
@@ -38,7 +53,8 @@
 .content {
     margin-left: 250px;
     min-height: 100vh;
-    background: var(--dark);
+    /*background: var(--primary);*/
+    background: #E2E8F0;
     transition: 0.5s;
 }
 
