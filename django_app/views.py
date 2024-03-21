@@ -5,6 +5,10 @@ from urllib import request
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext
+from django.views import View, generic
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .forms import SignupForm
+from django.contrib.auth import authenticate, login, logout
 
 from plotly.offline import plot
 import plotly.graph_objects as go
@@ -93,7 +97,7 @@ def dashboard(request):
 
     # ========================================== Page Render section =====================================================
 
-    return render(request, 'dashboard.html', {
+    return render(request, 'django_app/dashboard.html', {
         'plot_div_left': plot_div_left,
         'recent_stocks': recent_stocks
     })
@@ -121,3 +125,32 @@ def news(request):
     response.write(heading1)
 
     return response
+
+
+class SignUpView(generic.CreateView):
+    form_class = SignupForm
+    success_url = reverse_lazy('django_app/login')  # After signing up, redirect to login page
+    template_name = 'django_app/registration/signup.html'
+
+
+def login_here(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect(reverse('django_app:dashboard'))
+            else:
+                return HttpResponse('Your account is disabled')
+        else:
+            return HttpResponse('Login details are incorrect')
+    else:
+        return render(request, 'django_app/registration/login.html')
+
+
+@login_required
+def logout_here(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('django_app:dashboard'))

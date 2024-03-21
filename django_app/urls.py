@@ -17,19 +17,16 @@ Including another URLconf
 from django.urls import path
 
 from . import views
+from .views import SignUpView
 
 app_name = 'django_app'
 
 urlpatterns = [
-    # path('load_template/<str:template_id>', views.load_template, name='load_template'),
     path('', views.dashboard, name='dashboard'),
     path('predict/', views.predict, name='predict'),
     path('stockinfo/', views.stockInfo, name='stockInfo'),
     path('news/', views.news, name='news'),
-    # path('template1', views.temp1, name='template1'),
-    # path('template2', views.temp2, name='template2'),
-    # path('template3', views.temp3, name='template3'),
-    # path('template1editor', views.temp1edit, name='template1editor'),
-    # path('login/', views.login_here, name='login'),
-    # path('logout/', views.logout_here, name='logout'),
+    path('signup/', SignUpView.as_view(), name='signup'),
+    path('login/', views.login_here, name='login'),
+    path('logout/', views.logout_here, name='logout'),
 ]
