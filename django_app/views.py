@@ -7,6 +7,8 @@ from django.template.loader import render_to_string
 def homepage(request):
     return render(request, 'django_app/homepage.html')
 
+def searchView(request):
+    return render(request, 'django_app/search.html')
 #
 # def temp1(request):
 #     return render(request, 'ByteBusterApp/template1.html', )
