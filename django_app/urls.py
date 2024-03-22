@@ -24,6 +24,7 @@ urlpatterns = [
     # path('load_template/<str:template_id>', views.load_template, name='load_template'),
     path('', views.homepage, name='homepage'),
     path('search/', views.searchView, name='search'),
+    path('predict/<str:ticker_value>/<str:number_of_days>/', views.predict, name='predict'),
     # path('template1', views.temp1, name='template1'),
     # path('template2', views.temp2, name='template2'),
     # path('template3', views.temp3, name='template3'),
