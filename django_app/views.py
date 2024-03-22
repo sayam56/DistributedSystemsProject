@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 
 
+
 # Create your views here.
 def homepage(request):
     return render(request, 'django_app/homepage.html')
@@ -56,6 +57,7 @@ from sklearn import preprocessing,model_selection,linear_model
 from sklearn.linear_model import LinearRegression
 import plotly.graph_objects as go
 from plotly.offline import plot
+from plotly.io import json
 import datetime as dt
 def perform_prediction(ticker_value,df,input_days):
     #ML prediction code here
@@ -86,13 +88,16 @@ def stock_prediction_view(request):
 
         # Validate the ticker
         # Assuming validate_ticker is adjusted to return a boolean or similar instead of HttpResponse
-        if not validate_ticker(request, ticker_input):
+        if not validate_ticker(ticker_input):
             return render(request, 'Ticker_Unfounded.html')
 
         # Download data
         df=download_data(ticker_input)
         if df is None:
             return render(request,'yf_error.html')
+        dates = df.index.strftime('%Y-%m-%d').tolist()
+        closes = df['Close'].tolist()
+
         # Input days validation
         try:
             input_days=int(request.POST.get('days',10))
@@ -106,9 +111,11 @@ def stock_prediction_view(request):
             return render(request, 'Input_Days_Error.html', context)
 
 
+
         # Step 4: Perform prediction and generate the plot
         context = perform_prediction( ticker_input, df, input_days)
         ticker_info=get_ticker_info(ticker_input)
+        context.update({'chart_data': json.dumps({'dates': dates, 'closes': closes})})
         context.update({'ticker_info':ticker_info})
         return render(request, "predict.html", context)
 
