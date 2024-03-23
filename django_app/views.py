@@ -218,8 +218,13 @@ def search(request):
             searched_stock = form.cleaned_data['TickerName']
             ticker = form.cleaned_data['TickerName']
             days = form.cleaned_data['NumberofDays']
-            # Corrected redirect to use the 'stock_prediction_view' name
-            return redirect('django_app:stock_prediction_view', ticker=ticker, days=days)
+
+            # Check if the number of days is within the valid range
+            if 0 <= days <= 365:
+                return redirect('django_app:stock_prediction_view', ticker=ticker, days=days)
+            else:
+                # Handle invalid days
+                return render(request, 'django_app/Input_Days_Error.html', {'error': "Input days must be between 0 and 365."})
     else:
         form = SearchForm()
     return render(request, 'django_app/search.html', {'form': form, 'searched_stock': searched_stock})
@@ -272,22 +277,18 @@ def perform_prediction(ticker_value, forecast, last_date):
 
 
 def get_ticker_info(ticker_value, csv_path='django_app/Data/Tickers.csv'):
-    # Load the CSV file into a DataFrame
     ticker = pd.read_csv(csv_path)
 
     # Rename the columns to match the provided list
     ticker.columns = ['Symbol', 'Name', 'Last_Sale', 'Net_Change', 'Percent_Change', 'Market_Cap',
                       'Country', 'IPO_Year', 'Volume', 'Sector', 'Industry']
 
-    # Use boolean indexing to find the row where the 'Symbol' matches 'ticker_value'
     ticker_row = ticker[ticker['Symbol'] == ticker_value]
 
-    # If a match is found, return the information as a dictionary
     if not ticker_row.empty:
         ticker_info = ticker_row.iloc[0].to_dict()
         return ticker_info
     else:
-        # Return None or an error message if no match is found
         return None
 
 from sklearn.tree import DecisionTreeRegressor
@@ -295,17 +296,14 @@ from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 def download_and_prepare_data(ticker_value, period='3mo', interval='1h', number_of_days=30):
     try:
-        # Attempt to download the stock data
         df = yf.download(tickers=ticker_value, period=period, interval=interval)
     except Exception as e:
         print("Error downloading data:", e)
         return None
 
-    # Keep only the 'Adj Close' column and calculate the future price as a new column
     df = df[['Adj Close']]
     df['Future Price'] = df[['Adj Close']].shift(-number_of_days)
 
-    # Remove the last 'number_of_days' rows since they don't have a future price
     df = df[:-number_of_days]
 
     return df
@@ -316,7 +314,6 @@ def split_and_preprocess(df):
     X = df.drop(['Future Price'], axis=1).values
     y = df['Future Price'].values
 
-    # Scaling features
     X_scaled = preprocessing.scale(X)
 
     # Splitting the dataset into training and testing sets
@@ -326,13 +323,11 @@ def split_and_preprocess(df):
 
 
 def predict_stock_prices(X_train, X_test, y_train, y_test):
-    # Initialize the model
     model = DecisionTreeRegressor()
 
     # Train the model
     model.fit(X_train, y_train)
 
-    # Test the model
     score = model.score(X_test, y_test)
     print("Model Confidence:", score)
 
@@ -395,7 +390,6 @@ def stock_prediction_view(request, ticker, days):
     else:
         context.update({'error': "Failed to prepare data for prediction."})
 
-    # Update context with additional information
     ticker_info = get_ticker_info(ticker)
     #print(ticker_info)
 
