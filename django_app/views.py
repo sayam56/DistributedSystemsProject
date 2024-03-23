@@ -5,7 +5,7 @@ import pandas as pd
 import json
 from django.urls import reverse_lazy, reverse
 from urllib import request
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.views import View, generic
@@ -204,3 +204,204 @@ def login_here(request):
 def logout_here(request):
     logout(request)
     return HttpResponseRedirect(reverse('django_app:dashboard'))
+
+
+#################################################################################################################
+#################################################################################################################
+#################################################################################################################
+from django_app.forms import SearchForm
+def search(request):
+    searched_stock = None
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            searched_stock = form.cleaned_data['TickerName']
+            ticker = form.cleaned_data['TickerName']
+            days = form.cleaned_data['NumberofDays']
+            # Corrected redirect to use the 'stock_prediction_view' name
+            return redirect('django_app:stock_prediction_view', ticker=ticker, days=days)
+    else:
+        form = SearchForm()
+    return render(request, 'django_app/search.html', {'form': form, 'searched_stock': searched_stock})
+
+import pandas as pd
+def validate_ticker(ticker_input):
+    df = pd.read_csv('django_app/Data/new_tickers.csv')
+    symbols_list = df['Symbol'].tolist()
+    valid_tickers = symbols_list
+    #tickers are all uppercase
+    ticker_upper_value = ticker_input.upper()
+    return ticker_upper_value in valid_tickers
+
+
+import yfinance as yf
+def download_data( ticker_value):
+    try:
+        df=yf.download(tickers=ticker_value,period='1d',interval='1m')
+        print(f"{ticker_value} downloaded")
+        return df
+    except Exception as e:
+        print(e) #Log error
+        return
+
+
+import numpy as np
+from sklearn import preprocessing,model_selection,linear_model
+from sklearn.linear_model import LinearRegression
+import plotly.graph_objects as go
+from plotly.offline import plot
+import datetime as dt
+
+
+def perform_prediction(ticker_value, forecast, last_date):
+    pred_dict = {"Date": [], "Prediction": []}
+    start_date = pd.to_datetime(last_date)
+    for i in range(len(forecast)):
+        pred_dict["Date"].append(start_date + pd.Timedelta(days=i))
+        pred_dict["Prediction"].append(forecast[i])
+
+    pred_df = pd.DataFrame(pred_dict)
+    pred_fig = go.Figure([go.Scatter(x=pred_df['Date'], y=pred_df['Prediction'], mode='lines+markers')])
+    pred_fig.update_xaxes(rangeslider_visible=True)
+    pred_fig.update_layout(title=f"Stock Price Prediction for {ticker_value}",
+                           xaxis=dict(rangeslider=dict(visible=True), type="date"),
+                           paper_bgcolor="#14151b", plot_bgcolor="#14151b", font_color="white")
+    plot_div_pred = plot(pred_fig, auto_open=False, output_type='div')
+
+    return plot_div_pred
+
+
+def get_ticker_info(ticker_value, csv_path='django_app/Data/Tickers.csv'):
+    # Load the CSV file into a DataFrame
+    ticker = pd.read_csv(csv_path)
+
+    # Rename the columns to match the provided list
+    ticker.columns = ['Symbol', 'Name', 'Last_Sale', 'Net_Change', 'Percent_Change', 'Market_Cap',
+                      'Country', 'IPO_Year', 'Volume', 'Sector', 'Industry']
+
+    # Use boolean indexing to find the row where the 'Symbol' matches 'ticker_value'
+    ticker_row = ticker[ticker['Symbol'] == ticker_value]
+
+    # If a match is found, return the information as a dictionary
+    if not ticker_row.empty:
+        ticker_info = ticker_row.iloc[0].to_dict()
+        return ticker_info
+    else:
+        # Return None or an error message if no match is found
+        return None
+
+from sklearn.tree import DecisionTreeRegressor
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+def download_and_prepare_data(ticker_value, period='3mo', interval='1h', number_of_days=30):
+    try:
+        # Attempt to download the stock data
+        df = yf.download(tickers=ticker_value, period=period, interval=interval)
+    except Exception as e:
+        print("Error downloading data:", e)
+        return None
+
+    # Keep only the 'Adj Close' column and calculate the future price as a new column
+    df = df[['Adj Close']]
+    df['Future Price'] = df[['Adj Close']].shift(-number_of_days)
+
+    # Remove the last 'number_of_days' rows since they don't have a future price
+    df = df[:-number_of_days]
+
+    return df
+
+
+def split_and_preprocess(df):
+    # Features and labels
+    X = df.drop(['Future Price'], axis=1).values
+    y = df['Future Price'].values
+
+    # Scaling features
+    X_scaled = preprocessing.scale(X)
+
+    # Splitting the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+    return X_train, X_test, y_train, y_test
+
+
+def predict_stock_prices(X_train, X_test, y_train, y_test):
+    # Initialize the model
+    model = DecisionTreeRegressor()
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Test the model
+    score = model.score(X_test, y_test)
+    print("Model Confidence:", score)
+
+    # Predictions
+    predictions = model.predict(X_test)
+
+    return predictions, score
+
+def create_recent_stock_price_chart(dates, closes, ticker_value):
+    # Create a Plotly figure
+    recent_fig = go.Figure(data=[go.Scatter(x=dates, y=closes, mode='lines+markers')])
+    recent_fig.update_layout(title=f"Recent Stock Price of {ticker_value}",
+                             xaxis_title="Date",
+                             yaxis_title="Stock Price",
+                             paper_bgcolor="#14151b",
+                             plot_bgcolor="#14151b",
+                             font_color="white")
+
+    # Generate HTML div containing the plot
+    plot_div_live = plot(recent_fig, auto_open=False, output_type='div')
+
+    return plot_div_live
+
+def stock_prediction_view(request, ticker, days):
+    # Convert days from string to integer
+    try:
+        input_days = int(days)
+    except ValueError:
+        return render(request, 'django_app/Input_Days_Error.html', {'error': "Invalid number of days."})
+
+    if input_days < 1 or input_days > 365:
+        return render(request, 'django_app/Input_Days_Error.html', {'error': "Input days must be between 0 and 365."})
+
+    if not validate_ticker(ticker):
+        return render(request, 'django_app/Ticker_Unfounded.html')
+
+    df = download_data(ticker)
+    if df is None:
+        return render(request, 'django_app/yf_error.html')
+
+    last_date = df.index[-1].strftime('%Y-%m-%d %H:%M:%S')
+    dates = df.index.strftime('%Y-%m-%d %H:%M:%S').tolist()
+    closes = df['Close'].tolist()
+    #print(dates)
+    #print(closes)
+    context = {'chart_data':json.dumps({'dates': dates, 'closes': closes})}
+    plot_div_live = create_recent_stock_price_chart(dates, closes, ticker)
+    #print(plot_div_live)
+    context.update({'plot_div_live': plot_div_live})
+
+    # Prepare data for prediction
+    df_prepared = download_and_prepare_data(ticker, number_of_days=input_days)
+    if df_prepared is not None:
+        X_train, X_test, y_train, y_test = split_and_preprocess(df_prepared)
+        predictions, confidence = predict_stock_prices(X_train, X_test, y_train, y_test)
+        forecast_prediction = predictions[-input_days:]
+
+        plot_div_pred = perform_prediction(ticker, forecast_prediction,last_date)
+        context.update({'plot_div_pred': plot_div_pred})
+    else:
+        context.update({'error': "Failed to prepare data for prediction."})
+
+    # Update context with additional information
+    ticker_info = get_ticker_info(ticker)
+    #print(ticker_info)
+
+    context.update({
+        'ticker_info': ticker_info,
+        'days':days,
+    })
+    #print(context)
+    return render(request, "django_app/predict.html", context)

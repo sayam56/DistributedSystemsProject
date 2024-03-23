@@ -1,24 +1,116 @@
-{% extends "django_app/base.html" %}
+{% extends 'django_app/base.html' %}
+{% load static %}
 
-{% block title %}Prediction{% endblock %}
+{% block title %}
+    Predict
+{% endblock %}
 
-{% block content %}
-<h2>This is our Prediction page</h2>
-<div class="navigation">
-    <ul>
-      <!--
-        <li><a href="{% url 'stockapp:homepage' %}">Team Detail</a></li>
-        <li><a href="{% url 'stockapp:aboutus' %}">About Us</a></li>
-        <li><a href="{% url 'stockapp:stock_search' %}">Search</a></li>
-        <li><a href="{% url 'stockapp:news' %}">Team Detail</a></li>
-        <li><a href="{% url 'stockapp:predict' %}">Team Detail</a></li>
-        <li><a href="{% url 'accounts:members' %}">Team Detail</a></li>
-        -->
-    </ul>
-</div>
-<div class="predict-images">
-  <!--
-    <img src="{% static 'predict.jpg' %}" alt="Image of Stocks">
-    -->
-</div>
+{% block body_block %}
+    <h2>This is our Prediction page</h2>
+    <div class="container">
+        <header>
+
+        </header>
+
+        <section class="stock-information">
+            <h2>Information for {{ ticker_info.Symbol }}</h2>
+            <table>
+                <!-- Dynamic content from Django context -->
+                <tr>
+                    <th>Symbol</th>
+                    <td>{{ ticker_info.Symbol }}</td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td>{{ ticker_info.Name }}</td>
+                </tr>
+                <tr>
+                    <th>Last Sale</th>
+                    <td>{{ ticker_info.Last_Sale }}</td>
+                </tr>
+                <tr>
+                    <th>Net Change</th>
+                    <td>{{ ticker_info.Net_Change }}</td>
+                </tr>
+                <tr>
+                    <th>Percent Change</th>
+                    <td>{{ ticker_info.Percent_Change }}</td>
+                </tr>
+                <tr>
+                    <th>Market Cap</th>
+                    <td>{{ ticker_info.Market_Cap }}</td>
+                </tr>
+                <tr>
+                    <th>Country</th>
+                    <td>{{ ticker_info.Country }}</td>
+                </tr>
+                <tr>
+                    <th>IPO Year</th>
+                    <td>{{ ticker_info.IPO_Year }}</td>
+                </tr>
+                <tr>
+                    <th>Volume</th>
+                    <td>{{ ticker_info.Volume }}</td>
+                </tr>
+                <tr>
+                    <th>Sector</th>
+                    <td>{{ ticker_info.Sector }}</td>
+                </tr>
+                <tr>
+                    <th>Industry</th>
+                    <td>{{ ticker_info.Industry }}</td>
+                </tr>
+
+            </table>
+
+        </section>
+
+        <section class="stock-charts">
+            <h2>Recent Stock Price of {{ ticker_info.Symbol }}</h2>
+            <div id="live-chart">
+                {{ plot_div_live|safe }}
+            </div>
+
+            <h2>Predicted Stock Price of {{ ticker_info.Symbol }} for the next {{ days }} days</h2>
+            <div id="prediction-chart">
+                {{ plot_div_pred|safe }}
+            </div>
+        </section>
+
+        <footer>
+
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var chartData = [
+                {
+                    x: JSON.parse('{{ chart_data|safe }}').dates,
+                    y: JSON.parse('{{ chart_data|safe }}').closes,
+                    type: 'scatter'
+                }
+            ];
+            console.log(chartData);
+
+            var layout = {
+                title: 'Recent Stock Price',
+                xaxis: {
+                    title: 'Date',
+                    type: 'date'  // Ensuring x-axis is treated as date
+                },
+                yaxis: {
+                    title: 'Closing Price (USD)',
+                },
+                plot_bgcolor: 'lightgrey',
+                paper_bgcolor: 'whitesmoke',
+                font: {color: 'darkblue'},
+            };
+
+            Plotly.newPlot('live-chart', chartData, layout);
+
+        });
+    </script>
 {% endblock %}

@@ -29,4 +29,6 @@ urlpatterns = [
     # path('signup/', SignUpView.as_view(), name='signup'),
     # path('login/', views.login_here, name='login'),
     # path('logout/', views.logout_here, name='logout'),
+    path('search/',views.search, name='search'),
+    path('stock_prediction/<str:ticker>/<int:days>/',views.stock_prediction_view, name='stock_prediction_view'),
 ]
