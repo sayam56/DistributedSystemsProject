@@ -1,5 +1,5 @@
 """
-URL configuration for carsite project.
+URL configuration for django_project project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -22,7 +22,6 @@ from .views import SignUpView
 app_name = 'django_app'
 
 urlpatterns = [
-    path('/ticker', views.ticker, name='ticker'),
     path('', views.dashboard, name='dashboard'),
     path('predict/', views.predict, name='predict'),
     path('stockinfo/', views.stockInfo, name='stockInfo'),

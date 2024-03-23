@@ -28,23 +28,9 @@ import datetime as dt
 # Create your views here.
 
 
-
-def ticker(request):
-    # ================================================= Load Ticker Table ================================================
-    ticker_df = pd.read_csv('django_app/Data/new_tickers.csv')
-    json_ticker = ticker_df.reset_index().to_json(orient ='records')
-    ticker_list = []
-    ticker_list = json.loads(json_ticker)
-
-
-    return render(request, 'django_app/ticker.html', {
-        'ticker_list': ticker_list
-    })
-
-
 # Dashboard when Server loads
 def dashboard(request):
-    # ================================================= Left Card Plot =========================================================
+    # Left Card Plot
     # Here we used yf.download function
     data = yf.download(
         # passes the ticker
@@ -136,11 +122,15 @@ def predict(request):
 
 
 def stockInfo(request):
-    response = HttpResponse()
-    heading1 = '<p>' + 'Stock INFo PAGE:' + '</p>'
-    response.write(heading1)
+    #  Load Ticker Table
+    ticker_df = pd.read_csv('django_app/Data/new_tickers.csv')
+    json_ticker = ticker_df.reset_index().to_json(orient='records')
+    ticker_list = []
+    ticker_list = json.loads(json_ticker)
 
-    return response
+    return render(request, 'django_app/ticker.html', {
+        'ticker_list': ticker_list
+    })
 
 
 def news(request):
@@ -178,4 +168,3 @@ def login_here(request):
 def logout_here(request):
     logout(request)
     return HttpResponseRedirect(reverse('django_app:dashboard'))
-

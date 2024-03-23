@@ -53,8 +53,8 @@
                 <div class="d-flex align-items-center ms-4 mb-4">
                     <div class="position-relative">
                         {% if user.is_authenticated %}
-                                <img class="rounded-circle" src="{{ user.avatar }}" alt="" style="width: 40px; height: 40px;">
-                                <span> {{ user.avatar }}</span>
+                                <img class="rounded-circle" src="{{ user.profile.avatar.url }}" alt="" style="width: 40px; height: 40px;">
+{#                                <span> {{ user.avatar }}</span>#}
                             {% else %}
                                  <img class="rounded-circle" src="{% static 'django_app/image/user.png' %}" alt="" style="width: 40px; height: 40px;">
                             {% endif %}
