@@ -31,7 +31,7 @@ def dashboard(request):
     # Here we used yf.download function
     data = yf.download(
         # passes the ticker
-        tickers=['AAPL', 'AMZN', 'QCOM', 'META', 'NVDA', 'JPM'],
+        tickers=['AAPL', 'AMZN', 'QCOM', 'META', 'NVDA', 'GOOGL', 'UBER', 'TSLA'],
 
         group_by='ticker',
 
@@ -62,7 +62,13 @@ def dashboard(request):
         go.Scatter(x=data['Date'], y=data['NVDA']['Adj Close'], name="NVDA")
     )
     fig_left.add_trace(
-        go.Scatter(x=data['Date'], y=data['JPM']['Adj Close'], name="JPM")
+        go.Scatter(x=data['Date'], y=data['GOOGL']['Adj Close'], name="GOOGL")
+    )
+    fig_left.add_trace(
+        go.Scatter(x=data['Date'], y=data['UBER']['Adj Close'], name="UBER")
+    )
+    fig_left.add_trace(
+        go.Scatter(x=data['Date'], y=data['TSLA']['Adj Close'], name="TSLA")
     )
     fig_left.update_layout(paper_bgcolor="#14151b", plot_bgcolor="#14151b", font_color="white")
 
@@ -103,6 +109,7 @@ def dashboard(request):
     })
 
 
+@login_required
 def predict(request):
     response = HttpResponse()
     heading1 = '<p>' + 'PREDICT PAGE:' + '</p>'
