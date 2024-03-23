@@ -1,11 +1,12 @@
-{% extends "base.html" %}
-
-{% block title %}Search{% endblock %}
+{% extends "django_app/base.html" %}
 
 {% block content %}
-<h2>Search</h2>
-
-<div class="invalid-ticker-images">
-
-</div>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Search Stock</button>
+  </form>
+  {% if searched_stock %}
+    <p>Searched stock information: ${{ searched_stock }}</p>
+  {% endif %}
 {% endblock %}

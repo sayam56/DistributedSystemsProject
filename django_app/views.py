@@ -1,8 +1,9 @@
 from django.http import HttpResponse,HttpRequest
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from django.template.loader import render_to_string
 
+from django_app.form import SearchForm
 
 
 # Create your views here.
@@ -31,8 +32,19 @@ def homepage(request):
 #     html = render_to_string(template_name, request=request)
 #     return HttpResponse(html)
 
-def predict(request):
-    return render(request, 'django_app/predict.html')
+def search(request):
+    searched_stock = None
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            searched_stock = form.cleaned_data['TickerName']
+            ticker = form.cleaned_data['TickerName']
+            days = form.cleaned_data['NumberofDays']
+            return redirect('django_app:predict', ticker=ticker, days=days)
+    else:
+        form = SearchForm()
+    return render(request, 'django_app/search.html', {'form': form, 'searched_stock': searched_stock})
+
 
 
 import pandas as pd
@@ -82,15 +94,24 @@ def perform_prediction(ticker_value, forecast):
     return plot_div_pred
 
 
-def get_ticker_info(ticker_value, csv_path='/path/to/ticker_info.csv'):
-    df = pd.read_csv(csv_path)
-    ticker_info_row = df[df['Ticker'] == ticker_value]
-    if not ticker_info_row.empty:
-        ticker_info = ticker_info_row.to_dict('records')[0]
-    else:
-        ticker_info = {"error": "Ticker not found"}
-    return ticker_info
+def get_ticker_info(ticker_value, csv_path='app/Data/Tickers.csv'):
+    # Load the CSV file into a DataFrame
+    ticker = pd.read_csv(csv_path)
 
+    # Rename the columns to match the provided list
+    ticker.columns = ['Symbol', 'Name', 'Last_Sale', 'Net_Change', 'Percent_Change', 'Market_Cap',
+                      'Country', 'IPO_Year', 'Volume', 'Sector', 'Industry']
+
+    # Use boolean indexing to find the row where the 'Symbol' matches 'ticker_value'
+    ticker_row = ticker[ticker['Symbol'] == ticker_value]
+
+    # If a match is found, return the information as a dictionary
+    if not ticker_row.empty:
+        ticker_info = ticker_row.iloc[0].to_dict()
+        return ticker_info
+    else:
+        # Return None or an error message if no match is found
+        return None
 
 from sklearn.tree import DecisionTreeRegressor
 from sklearn import preprocessing
@@ -200,4 +221,4 @@ def stock_prediction_view(request):
         return render(request, "predict.html", context)
 
     # GET request or initial page load
-    return render(request, "search.html")
+    return render(request, "django_app/search.html")

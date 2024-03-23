@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "django_app/base.html" %}
 
 {% block title %}Prediction{% endblock %}
 
@@ -10,16 +10,52 @@
         </header>
 
         <section class="stock-information">
-            <h2>Information</h2>
+            <h2>Information for {{ stock_info.Symbol }}</h2>
             <table>
                 <!-- Dynamic content from Django context -->
                 <tr>
                     <th>Symbol</th>
-                    <td>{{ stock_info.symbol }}</td>
+                    <td>{{ stock_info.Symbol }}</td>
                 </tr>
                 <tr>
                     <th>Name</th>
-                    <td>{{ stock_info.name }}</td>
+                    <td>{{ stock_info.Name }}</td>
+                </tr>
+                <tr>
+                    <th>Last Sale</th>
+                    <td>{{ stock_info.Last_Sale }}</td>
+                </tr>
+                <tr>
+                    <th>Net Change</th>
+                    <td>{{ stock_info.Net_Change }}</td>
+                </tr>
+                <tr>
+                    <th>Percent Change</th>
+                    <td>{{ stock_info.Percent_Change }}</td>
+                </tr>
+                <tr>
+                    <th>Market Cap</th>
+                    <td>{{ stock_info.Market_Cap }}</td>
+                </tr>
+                <tr>
+                    <th>Country</th>
+                    <td>{{ stock_info.Country }}</td>
+                </tr>
+                <tr>
+                    <th>IPO Year</th>
+                    <td>{{ stock_info.IPO_Year }}</td>
+                </tr>
+                <tr>
+                    <th>Volume</th>
+                    <td>{{ stock_info.Volume }}</td>
+                </tr>
+                <tr>
+                    <th>Sector</th>
+                    <td>{{ stock_info.Sector }}</td>
+                </tr>
+                <tr>
+                    <th>Industry</th>
+                    <td>{{ stock_info.Industry }}</td>
                 </tr>
                 <!-- Additional rows for stock info -->
             </table>
@@ -27,12 +63,12 @@
         </section>
 
         <section class="stock-charts">
-            <h2>Recent Stock Price of {{ stock_info.symbol }}</h2>
+            <h2>Recent Stock Price of {{ stock_info.Symbol }}</h2>
             <div id="live-chart">
                 <!-- Plotly chart for recent stock prices would be here if provided -->
             </div>
 
-            <h2>Predicted Stock Price of {{ stock_info.symbol }} for the next 10 days</h2>
+            <h2>Predicted Stock Price of {{ stock_info.Symbol }} for the next 10 days</h2>
             <div id="prediction-chart">
                 {{ plot_div_pred|safe }}
             </div>
@@ -44,17 +80,16 @@
     </div>
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- The below script is only needed if 'chart_data' contains the recent stock prices data for plotting -->
     <script>
-        // Example to dynamically generate a Plotly chart using data from the Django context
-        // This assumes 'chart_data' is passed from Django view as a JSON string
-
-        // Example data, replace with 'chart_data' passed from Django
+        // The below code assumes 'chart_data' is structured correctly for Plotly and contains recent stock price data
         var chartData = JSON.parse('{{ chart_data|safe }}');
 
         var layout = {
-            title: 'Predicted Stock Price',
+            title: 'Recent Stock Price',
             xaxis: {
                 title: 'Date',
+                type: 'date'  // Ensuring x-axis is treated as date
             },
             yaxis: {
                 title: 'Closing Price (USD)',
@@ -64,6 +99,6 @@
             font: {color: 'darkblue'},
         };
 
-        Plotly.newPlot('prediction-chart', [chartData], layout);
+        Plotly.newPlot('live-chart', chartData, layout);
     </script>
 {% endblock %}
