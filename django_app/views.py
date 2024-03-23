@@ -11,6 +11,7 @@ from .forms import SignupForm
 from .utils import get_news
 from django.contrib.auth import authenticate, login, logout
 
+
 from plotly.offline import plot
 import plotly.graph_objects as go
 import plotly.express as px
