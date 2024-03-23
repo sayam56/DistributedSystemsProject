@@ -1,0 +1,64 @@
+{% extends 'django_app/base.html' %}
+{% block body_block %}
+     <div class="container-fluid pt-4 px-4">
+                <div class="bg-secondary text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">All Stocks</h6>
+                    <form class="d-flex" action="{% url 'django_app:stockInfo' %}" method="get">
+                        {{ form.q }}
+                        <button class="show-all-button" type="submit">Search</button>
+                    </form>
+
+{#                    <a href="https://finance.yahoo.com/trending-tickers" class="show-all-button" target="_blank">Show All</a>#}
+                </div>
+
+                    <div class="table-responsive">
+                        <table class="table text-start align-middle table-bordered table-hover mb-0">
+                            <thead>
+                                <tr class="text-white">
+                                    <th scope="col">Stock Symbol</th>
+                                    <th scope="col">Stock Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if no_results %}
+                                   <p>No results found.</p>
+                                {% else %}
+                                    {% if ticker_list %}
+                                        {% for i in ticker_list %}
+                                            <tr>
+                                                <td>{{ i.Symbol }}</td>
+                                                <td>{{ i.Name }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                  <!-- Pagination Links -->
+                    {#code provided by JIYU#}
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if ticker_list.has_previous %}
+                                <a href="?page=1">&laquo; first</a>
+                                <a href="?page={{ ticker_list.previous_page_number }}">previous</a>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ ticker_list.number }} of {{ ticker_list.paginator.num_pages }}.
+                            </span>
+
+                            {% if ticker_list.has_next %}
+                                <a href="?page={{ ticker_list.next_page_number }}">next</a>
+                                <a href="?page={{ ticker_list.paginator.num_pages }}">last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+{% endblock %}

@@ -9,3 +9,7 @@ class SignupForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2', ]
+
+
+class StockSearch(forms.Form):
+    q = forms.CharField(label='', widget=forms.TextInput(attrs={'class': 'form-control me-2', 'type': 'search', 'placeholder': 'Stock Symbol', 'aria-label': 'Search'}))

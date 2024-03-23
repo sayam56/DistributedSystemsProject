@@ -1,5 +1,8 @@
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.loader import render_to_string
+import pandas as pd
+import json
 from django.urls import reverse_lazy, reverse
 from urllib import request
 from django.shortcuts import render
@@ -7,7 +10,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.views import View, generic
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import SignupForm
+from .forms import StockSearch, SignupForm
 from django.contrib.auth import authenticate, login, logout
 
 from plotly.offline import plot
@@ -25,13 +28,14 @@ import datetime as dt
 
 # Create your views here.
 
+
 # Dashboard when Server loads
 def dashboard(request):
-    # ================================================= Left Card Plot =========================================================
+    # Left Card Plot
     # Here we used yf.download function
     data = yf.download(
         # passes the ticker
-        tickers=['AAPL', 'AMZN', 'QCOM', 'META', 'NVDA', 'JPM'],
+        tickers=['AAPL', 'AMZN', 'QCOM', 'META', 'NVDA', 'GOOGL', 'UBER', 'TSLA'],
 
         group_by='ticker',
 
@@ -62,7 +66,13 @@ def dashboard(request):
         go.Scatter(x=data['Date'], y=data['NVDA']['Adj Close'], name="NVDA")
     )
     fig_left.add_trace(
-        go.Scatter(x=data['Date'], y=data['JPM']['Adj Close'], name="JPM")
+        go.Scatter(x=data['Date'], y=data['GOOGL']['Adj Close'], name="GOOGL")
+    )
+    fig_left.add_trace(
+        go.Scatter(x=data['Date'], y=data['UBER']['Adj Close'], name="UBER")
+    )
+    fig_left.add_trace(
+        go.Scatter(x=data['Date'], y=data['TSLA']['Adj Close'], name="TSLA")
     )
     fig_left.update_layout(paper_bgcolor="#14151b", plot_bgcolor="#14151b", font_color="white")
 
@@ -72,19 +82,25 @@ def dashboard(request):
 
     df1 = yf.download(tickers='AAPL', period='1d', interval='1d')
     df2 = yf.download(tickers='AMZN', period='1d', interval='1d')
-    df3 = yf.download(tickers='GOOGL', period='1d', interval='1d')
-    df4 = yf.download(tickers='UBER', period='1d', interval='1d')
-    df5 = yf.download(tickers='TSLA', period='1d', interval='1d')
+    df3 = yf.download(tickers='QCOM', period='1d', interval='1d')
+    df4 = yf.download(tickers='META', period='1d', interval='1d')
+    df5 = yf.download(tickers='NVDA', period='1d', interval='1d')
+    df6 = yf.download(tickers='GOOGL', period='1d', interval='1d')
+    df7 = yf.download(tickers='UBER', period='1d', interval='1d')
+    df8 = yf.download(tickers='TSLA', period='1d', interval='1d')
     # df6 = yf.download(tickers='TWTR', period='1d', interval='1d')
 
     df1.insert(0, "Ticker", "AAPL")
     df2.insert(0, "Ticker", "AMZN")
-    df3.insert(0, "Ticker", "GOOGL")
-    df4.insert(0, "Ticker", "UBER")
-    df5.insert(0, "Ticker", "TSLA")
+    df3.insert(0, "Ticker", "QCOM")
+    df4.insert(0, "Ticker", "META")
+    df5.insert(0, "Ticker", "NVDA")
+    df6.insert(0, "Ticker", "GOOGL")
+    df7.insert(0, "Ticker", "UBER")
+    df8.insert(0, "Ticker", "TSLA")
     # df6.insert(0, "Ticker", "TWTR")
 
-    df = pd.concat([df1, df2, df3, df4, df5], axis=0)
+    df = pd.concat([df1, df2, df3, df4, df5, df6, df7, df8], axis=0)
     df.reset_index(level=0, inplace=True)
     df.columns = ['Date', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Adj_Close', 'Volume']
     convert_dict = {'Date': object}
@@ -103,6 +119,7 @@ def dashboard(request):
     })
 
 
+@login_required
 def predict(request):
     response = HttpResponse()
     heading1 = '<p>' + 'PREDICT PAGE:' + '</p>'
@@ -112,11 +129,44 @@ def predict(request):
 
 
 def stockInfo(request):
-    response = HttpResponse()
-    heading1 = '<p>' + 'Stock INFo PAGE:' + '</p>'
-    response.write(heading1)
+    # Load Ticker Table
+    ticker_df = pd.read_csv('django_app/Data/new_tickers.csv')
 
-    return response
+    # Get the query (if it exists)
+    query = request.GET.get('q')
+    no_results = False
+
+    if query:
+        # Filter the DataFrame based on the query
+        ticker_df = ticker_df[ticker_df['Symbol'].str.contains(query, case=False)]
+
+        if ticker_df.empty:
+            no_results = True
+
+    ticker_list = ticker_df.to_dict('records')  # Convert DataFrame to list of dicts
+
+    # provided by JIYU
+    # Set up pagination - 18 rows per page
+    page = request.GET.get('page', 1)  # Get the page number from the request
+    paginator = Paginator(ticker_list, 18)  # Instantiate Paginator with 40 items per page
+
+    try:
+        tickers = paginator.page(page)  # Get the page of tickers
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        tickers = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        tickers = paginator.page(paginator.num_pages)
+
+    # Create an instance of the form
+    form = StockSearch(request.GET)
+
+    return render(request, 'django_app/ticker.html', {
+        'ticker_list': tickers,
+        'no_results': no_results,
+        'form': form
+    })
 
 
 def news(request):
