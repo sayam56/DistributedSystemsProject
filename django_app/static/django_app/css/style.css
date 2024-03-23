@@ -208,3 +208,39 @@
         margin-left: 15px;
     }
 }
+
+/*pagination style*/
+.step-links a{
+    color: #4ADE80;
+    font-weight: bold;
+    font-family: 'Inter', sans-serif;
+}
+
+
+/* Add to Favourites Button Styles */
+.btn-success.add-to-favourites {
+    background-color: #191C24;
+    border: 1px solid #4ADE80;
+    color: #4ADE80;
+}
+
+.btn-success.add-to-favourites:hover {
+    background-color: #4ADE80;
+    color: #191C24;
+    transform: scale(1.1);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Remove Button Styles */
+.btn-primary.remove-from-favourites {
+    background-color: #191C24;
+    border: 1px solid #FC0404;
+    color: #FC0404;
+}
+
+.btn-primary.remove-from-favourites:hover {
+    background-color: #FC0404;
+    color: white;
+    transform: scale(1.1);
+    transition: all 0.2s ease-in-out;
+}
