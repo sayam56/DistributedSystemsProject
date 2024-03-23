@@ -10,6 +10,8 @@
             <li>
                 <h2>{{ news_item.title }}</h2>
                 <p>{{ news_item.description }}</p>
+                <p>{{ news_item.published_at }}</p>
+                <img src="{{ news_item.image_url }}" alt="Image">
                 <a href="{{ news_item.url }}">Source Page</a>
             </li>
         {% endfor %}
