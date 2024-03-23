@@ -4,19 +4,17 @@ import requests
 def get_news():
     url = 'https://api.marketaux.com/v1/news/all'
     headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer 659FVmRJ98V2UbhRN2Rdr6irbuO2k6Ckb29KS0MB',
-        # Add any necessary authentication headers if required
+        'Authorization': 'Bearer 659FVmRJ98V2UbhRN2Rdr6irbuO2k6Ckb29KS0MB'
     }
     params = {
-        'language': 'en',
-        'symbols': 'ONGC,TSLA',
+        'symbols': 'TSLA,AMZN,MSFT',
         'filter_entities': 'true',
-        'sentiment_gte': '0.1',
-        'entity_types': 'index,equity',
+        'language': 'en',
+
     }
 #GET https://api.marketaux.com/v1/news/all?sentiment_gte=0.1&language=en&api_token=659FVmRJ98V2UbhRN2Rdr6irbuO2k6Ckb29KS0MB
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, params=params)
+
     if response.status_code == 200:
         return response.json()
     else:
