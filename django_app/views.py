@@ -28,6 +28,7 @@ import yfinance as yf
 import datetime as dt
 
 from accounts.models import UserProfile
+from .utils import get_news
 
 
 # Create your views here.
@@ -255,3 +256,9 @@ def favourites(request):
     return render(request, 'django_app/favourites.html', {
         'favourite_list': favourite_stocks
     })
+
+
+# ========================================== News API Section =====================================================
+def news_list(request):
+    news_data = get_news()
+    return render(request, 'django_app/news_API.html', {'news_data': news_data})

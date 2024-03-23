@@ -74,7 +74,7 @@
                     <a href="{% url 'django_app:predict'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'predict' %}active{% endif %}" ><i class="fa fa-search me-2"></i>Prediction</a>
                     <a href="{% url 'django_app:stockInfo'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'stockInfo' %}active{% endif %}"><i class="fa fa-info me-2"></i>Stock Info</a>
                     <a href="{% url 'django_app:favourites'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'favourites' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>Favourites</a>
-                    <a href="{% url 'django_app:news'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>News</a>
+                    <a href="{% url 'django_app:news_api'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>News</a>
                 </div>
 
             </nav>

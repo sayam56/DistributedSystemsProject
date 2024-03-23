@@ -1,0 +1,32 @@
+{% extends 'django_app/base.html' %}
+{% load static %}
+
+{% block title %}
+    News
+{% endblock %}
+
+
+{% block body_block %}
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-12">
+                <div class="bg-secondary text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">News</h6>
+                    </div>
+        <ul class="list-unstyled">
+            {% for news_item in news_data.data %}
+                <li class="my-4">
+                    <h2>{{ news_item.title }}</h2>
+                    <p>{{ news_item.description }}</p>
+                    <p class="text-muted">{{ news_item.published_at }}</p>
+                    <img src="{{ news_item.image_url }}" alt="Image" class="img-fluid"><br>
+                    <a href="{{ news_item.url }}" class="btn btn-primary mt-2">Source Page</a>
+                </li>
+            {% endfor %}
+        </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
