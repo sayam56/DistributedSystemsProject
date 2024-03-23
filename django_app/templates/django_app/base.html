@@ -72,8 +72,8 @@
                 <div class="navbar-nav w-100">
                     <a href="{% url 'django_app:dashboard'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" ><i class="fa fa-home me-2"></i>Dashboard</a>
                     <a href="{% url 'django_app:predict'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'predict' %}active{% endif %}" ><i class="fa fa-search me-2"></i>Prediction</a>
-                    <a href="{% url 'django_app:stockInfo'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'stockInfo' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>Stock Info</a>
-                    <a href="{% url 'django_app:news'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-check me-2"></i>News</a>
+                    <a href="{% url 'django_app:stockInfo'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'stockInfo' %}active{% endif %}"><i class="fa fa-info me-2"></i>Stock Info</a>
+                    <a href="{% url 'django_app:news'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>News</a>
                 </div>
 
             </nav>
@@ -86,7 +86,7 @@
             <!-- Navbar Start -->
             <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
                 <a href="../.." class="navbar-brand d-flex d-lg-none me-4">
-                    <h2 class="text-primary mb-0"><i class="fa fa-user-edit"></i></h2>
+{#                    <h2 class="text-primary mb-0"><i class="fa fa-user-edit"></i></h2>#}
                 </a>
                 <a href="#" class="sidebar-toggler flex-shrink-0">
                     <i class="fa fa-bars icon-color"></i>
