@@ -34,7 +34,7 @@
 
             <h2>Predicted Stock Price of {{ stock_info.symbol }} for the next 10 days</h2>
             <div id="prediction-chart">
-                <!-- The Plotly chart for predicted stock prices will be rendered here -->
+                {{ plot_div_pred|safe }}
             </div>
         </section>
 

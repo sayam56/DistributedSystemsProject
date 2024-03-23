@@ -34,10 +34,14 @@ def homepage(request):
 def predict(request):
     return render(request, 'django_app/predict.html')
 
+
+import pandas as pd
 def validate_ticker(ticker_input):
-    valid_tickers=[ ]
+    df = pd.read_csv('django_app/Data/ticker_list.csv')
+    symbols_list = df['Symbol'].tolist()
+    valid_tickers = symbols_list
     #tickers are all uppercase
-    ticker_upper_value=ticker_input.upper()
+    ticker_upper_value = ticker_input.upper()
     return ticker_upper_value in valid_tickers
 
 
@@ -59,19 +63,25 @@ import plotly.graph_objects as go
 from plotly.offline import plot
 from plotly.io import json
 import datetime as dt
-def perform_prediction(ticker_value,df,input_days):
-    #ML prediction code here
-    fig = go.Figure(data=[
-        go.Line(x=df['Date'], y=df['StockPrice'])  # Replace 'Date' and 'StockPrice' with your actual DataFrame columns
-    ])
-    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
-    #After preparing preddiction and plot
-    context={
-        'plot_div':plot_div,
-    }
-    return context
 
-import pandas as pd
+
+def perform_prediction(ticker_value, forecast):
+    # Assuming `forecast` is a list of predictions for the next `n` days
+    pred_dict = {"Date": [], "Prediction": []}
+    for i in range(0, len(forecast)):
+        pred_dict["Date"].append(dt.datetime.today() + dt.timedelta(days=i))
+        pred_dict["Prediction"].append(forecast[i])
+
+    pred_df = pd.DataFrame(pred_dict)
+    pred_fig = go.Figure([go.Scatter(x=pred_df['Date'], y=pred_df['Prediction'], mode='lines+markers')])
+    pred_fig.update_xaxes(rangeslider_visible=True)
+    pred_fig.update_layout(title=f"Stock Price Prediction for {ticker_value}",
+                           paper_bgcolor="#14151b", plot_bgcolor="#14151b", font_color="white")
+    plot_div_pred = plot(pred_fig, auto_open=False, output_type='div')
+
+    return plot_div_pred
+
+
 def get_ticker_info(ticker_value, csv_path='/path/to/ticker_info.csv'):
     df = pd.read_csv(csv_path)
     ticker_info_row = df[df['Ticker'] == ticker_value]
@@ -81,9 +91,62 @@ def get_ticker_info(ticker_value, csv_path='/path/to/ticker_info.csv'):
         ticker_info = {"error": "Ticker not found"}
     return ticker_info
 
+
+from sklearn.tree import DecisionTreeRegressor
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+def download_and_prepare_data(ticker_value, period='3mo', interval='1h', number_of_days=30):
+    try:
+        # Attempt to download the stock data
+        df = yf.download(tickers=ticker_value, period=period, interval=interval)
+    except Exception as e:
+        print("Error downloading data:", e)
+        return None
+
+    # Keep only the 'Adj Close' column and calculate the future price as a new column
+    df = df[['Adj Close']]
+    df['Future Price'] = df[['Adj Close']].shift(-number_of_days)
+
+    # Remove the last 'number_of_days' rows since they don't have a future price
+    df = df[:-number_of_days]
+
+    return df
+
+
+def split_and_preprocess(df):
+    # Features and labels
+    X = df.drop(['Future Price'], axis=1).values
+    y = df['Future Price'].values
+
+    # Scaling features
+    X_scaled = preprocessing.scale(X)
+
+    # Splitting the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+    return X_train, X_test, y_train, y_test
+
+
+def predict_stock_prices(X_train, X_test, y_train, y_test):
+    # Initialize the model
+    model = DecisionTreeRegressor()
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Test the model
+    score = model.score(X_test, y_test)
+    print("Model Confidence:", score)
+
+    # Predictions
+    predictions = model.predict(X_test)
+
+    return predictions, score
+
 def stock_prediction_view(request):
     if request.method == "POST":
-        ticker_input = request.POST.get("ticker", "").strip()
+        ticker_input="A"
+        #ticker_input = request.POST.get("ticker", "").strip()
         #input_days = request.POST.get("days", "10").strip()
 
         # Validate the ticker
@@ -100,7 +163,8 @@ def stock_prediction_view(request):
 
         # Input days validation
         try:
-            input_days=int(request.POST.get('days',10))
+            input_days=30
+            #input_days=int(request.POST.get('days',10))
             if input_days<0:
                 raise ValueError("Input days cannot be less than zero.")
             elif input_days>365:
@@ -110,14 +174,30 @@ def stock_prediction_view(request):
             context = {'error': str(e)}
             return render(request, 'Input_Days_Error.html', context)
 
+            # Prepare data for prediction
+            #df_prepared = download_and_prepare_data('A', number_of_days=30)
+            df_prepared = download_and_prepare_data(ticker_input, number_of_days=input_days)
+            if df_prepared is not None:
+                X_train, X_test, y_train, y_test = split_and_preprocess(df_prepared)
+                predictions, confidence = predict_stock_prices(X_train, X_test, y_train, y_test)
 
+                # Generating predictions for the future, not just the test set
+                # This part of the code will need adjustments based on how you want to handle future predictions
 
-        # Step 4: Perform prediction and generate the plot
-        context = perform_prediction( ticker_input, df, input_days)
-        ticker_info=get_ticker_info(ticker_input)
-        context.update({'chart_data': json.dumps({'dates': dates, 'closes': closes})})
-        context.update({'ticker_info':ticker_info})
+                # For demonstration, let's assume predictions[-input_days:] gives us future predictions
+                forecast_prediction = predictions[-input_days:]
+
+                # Generate the prediction plot
+                plot_div_pred = perform_prediction(ticker_input, forecast_prediction)
+                context = {'plot_div_pred': plot_div_pred}
+            else:
+                context = {'error': "Failed to prepare data for prediction."}
+
+            # Update context with additional information
+            ticker_info = get_ticker_info(ticker_input)
+            context.update({'chart_data': json.dumps({'dates': dates, 'closes': closes}), 'ticker_info': ticker_info})
+
         return render(request, "predict.html", context)
 
     # GET request or initial page load
-    return render(request, "stock_input_form.html")
+    return render(request, "search.html")
