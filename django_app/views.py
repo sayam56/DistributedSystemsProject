@@ -122,15 +122,23 @@ def predict(request):
 
 
 def stockInfo(request):
-    #  Load Ticker Table
+    # Load Ticker Table
     ticker_df = pd.read_csv('django_app/Data/new_tickers.csv')
+
+    # Get the query (if it exists)
+    query = request.GET.get('q')
+
+    if query:
+        # Filter the DataFrame based on the query
+        ticker_df = ticker_df[ticker_df['Symbol'].str.contains(query, case=False)]
+
     json_ticker = ticker_df.reset_index().to_json(orient='records')
-    ticker_list = []
     ticker_list = json.loads(json_ticker)
 
     return render(request, 'django_app/ticker.html', {
         'ticker_list': ticker_list
     })
+
 
 
 def news(request):
