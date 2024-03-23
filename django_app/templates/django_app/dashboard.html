@@ -1,0 +1,73 @@
+{% extends 'django_app/base.html' %}
+{% load static %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block body_block %}
+    <!-- Active Stock Section Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-12">
+                <div class="bg-secondary text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Active Stocks</h6>
+                    </div>
+                        <!-- plotting is done here -->
+                    {% block Left_Plot %}
+                        {% autoescape off %}
+                            {{ plot_div_left }}
+                        {% endautoescape %}
+                    {% endblock Left_Plot %}
+                    <!-- plotting ends -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Active Stock Section End -->
+
+
+    <!-- Recent Sales Start -->
+    <div class="container-fluid pt-4 px-4">
+            <div class="bg-secondary text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Recent Stocks</h6>
+                    <a href="https://finance.yahoo.com/trending-tickers" class="show-all-button" target="_blank">Show All</a>
+                </div>
+                <div class="table-responsive">
+                    <!-- Recent stocks data here-->
+                    <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="text-white">
+                                <th scope="col">Stock</th>
+                                <th scope="col">Open</th>
+                                <th scope="col">High</th>
+                                <th scope="col">Low</th>
+                                <th scope="col">Close</th>
+                                <th scope="col">Adj. Close</th>
+                                <th scope="col">Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recent_stocks %}
+                            {% for i in recent_stocks %}
+                            <tr>
+                                <td>{{i.Ticker}}</td>
+                                <td>{{i.Open}}</td>
+                                <td>{{i.High}}</td>
+                                <td>{{i.Low}}</td>
+                                <td>{{i.Close}}</td>
+                                <td>{{i.Adj_Close}}</td>
+                                <td>{{i.Volume}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+    <!-- Recent Sales End -->
+
+{% endblock %}
