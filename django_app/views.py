@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template.loader import render_to_string
 import pandas as pd
 import json
@@ -12,6 +12,8 @@ from django.views import View, generic
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StockSearch, SignupForm
 from django.contrib.auth import authenticate, login, logout
+from .models import Stock, Favourite
+from django.shortcuts import redirect
 
 from plotly.offline import plot
 import plotly.graph_objects as go
@@ -24,6 +26,8 @@ import json
 
 import yfinance as yf
 import datetime as dt
+
+from accounts.models import UserProfile
 
 
 # Create your views here.
@@ -78,7 +82,7 @@ def dashboard(request):
 
     plot_div_left = plot(fig_left, auto_open=False, output_type='div')
 
-    # ================================================ To show recent stocks ==============================================
+    #  To show recent stocks
 
     df1 = yf.download(tickers='AAPL', period='1d', interval='1d')
     df2 = yf.download(tickers='AMZN', period='1d', interval='1d')
@@ -111,8 +115,7 @@ def dashboard(request):
     recent_stocks = []
     recent_stocks = json.loads(json_records)
 
-    # ========================================== Page Render section =====================================================
-
+    #  Page Render section
     return render(request, 'django_app/dashboard.html', {
         'plot_div_left': plot_div_left,
         'recent_stocks': recent_stocks
@@ -128,9 +131,14 @@ def predict(request):
     return response
 
 
+@login_required
 def stockInfo(request):
     # Load Ticker Table
     ticker_df = pd.read_csv('django_app/Data/new_tickers.csv')
+
+    # Create or update Stock objects for each stock in the DataFrame
+    # for index, row in ticker_df.iterrows():
+    # Stock.objects.update_or_create(symbol=row['Symbol'], name=row['Name'])
 
     # Get the query (if it exists)
     query = request.GET.get('q')
@@ -145,10 +153,16 @@ def stockInfo(request):
 
     ticker_list = ticker_df.to_dict('records')  # Convert DataFrame to list of dicts
 
-    # provided by JIYU
+    # Get the user's favourite stocks
+    favourite_stocks = Favourite.objects.filter(user=request.user).values_list('stock_id', flat=True)
+
+    # Add a 'favourite' attribute to each stock in the ticker list
+    for i in ticker_list:
+        i['favourite'] = i['id'] in favourite_stocks
+
     # Set up pagination - 18 rows per page
     page = request.GET.get('page', 1)  # Get the page number from the request
-    paginator = Paginator(ticker_list, 18)  # Instantiate Paginator with 40 items per page
+    paginator = Paginator(ticker_list, 18)  # Instantiate Paginator with 18 items per page
 
     try:
         tickers = paginator.page(page)  # Get the page of tickers
@@ -167,6 +181,20 @@ def stockInfo(request):
         'no_results': no_results,
         'form': form
     })
+
+
+@login_required
+def add_to_favourites(request, stock_id):
+    stock = Stock.objects.get(id=stock_id)
+    Favourite.objects.create(user=request.user, stock=stock)
+    return JsonResponse({'success': True})
+
+
+@login_required
+def remove_from_favourites(request, stock_id):
+    stock = Stock.objects.get(id=stock_id)
+    Favourite.objects.filter(user=request.user, stock=stock).delete()
+    return JsonResponse({'success': True})
 
 
 def news(request):
@@ -204,3 +232,26 @@ def login_here(request):
 def logout_here(request):
     logout(request)
     return HttpResponseRedirect(reverse('django_app:dashboard'))
+
+
+@login_required
+def favourites(request):
+    # Get the user's favourite stocks
+    favouriteStocks = Favourite.objects.filter(user=request.user).select_related('stock')
+
+    # Set up pagination - 18 rows per page
+    page = request.GET.get('page', 1)  # Get the page number from the request
+    paginator = Paginator(favouriteStocks, 18)  # Instantiate Paginator with 18 items per page
+
+    try:
+        favourite_stocks = paginator.page(page)  # Get the page of tickers
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        favourite_stocks = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        favourite_stocks = paginator.page(paginator.num_pages)
+
+    return render(request, 'django_app/favourites.html', {
+        'favourite_list': favourite_stocks
+    })
