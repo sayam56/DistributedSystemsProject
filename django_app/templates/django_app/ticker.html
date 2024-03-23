@@ -1,4 +1,7 @@
 {% extends 'django_app/base.html' %}
+{% block title %}
+    Stock Info
+{% endblock %}
 {% block body_block %}
      <div class="container-fluid pt-4 px-4">
                 <div class="bg-secondary text-center rounded p-4">
@@ -18,6 +21,7 @@
                                 <tr class="text-white">
                                     <th scope="col">Stock Symbol</th>
                                     <th scope="col">Stock Name</th>
+                                    <th scope="col">Add To Favourites</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -29,6 +33,13 @@
                                             <tr>
                                                 <td>{{ i.Symbol }}</td>
                                                 <td>{{ i.Name }}</td>
+                                                 <td>
+                                                    {% if i.favourite %}
+                                                        <a href="{% url 'django_app:remove_from_favourites' i.id %}" data-stock-id="{{ i.id }}" class="btn btn-primary remove-from-favourites">Remove</a>
+                                                    {% else %}
+                                                        <a href="#" data-stock-id="{{ i.id }}" class="btn btn-success add-to-favourites">Add to Favourites</a>
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     {% endif %}
@@ -60,5 +71,39 @@
                 </div>
 
             </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $(document).on('click', '.add-to-favourites', function(e){
+    e.preventDefault();
+    var button = $(this);
+    var stock_id = button.data('stock-id');
+    $.ajax({
+      url: '/add_to_favourites/' + stock_id + '/',
+      success: function(response) {
+        button.text('Remove');
+        button.removeClass('btn-success add-to-favourites');
+        button.addClass('btn-primary remove-from-favourites');
+      }
+    });
+  });
+
+  $(document).on('click', '.remove-from-favourites', function(e){
+    e.preventDefault();
+    var button = $(this);
+    var stock_id = button.data('stock-id');
+    $.ajax({
+      url: '/remove_from_favourites/' + stock_id + '/',
+      success: function(response) {
+        button.text('Add to Favourites');
+        button.removeClass('btn-primary remove-from-favourites');
+        button.addClass('btn-success add-to-favourites');
+      }
+    });
+  });
+});
+</script>
+
 
 {% endblock %}

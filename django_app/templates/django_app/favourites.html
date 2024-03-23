@@ -1,0 +1,35 @@
+{% extends 'django_app/base.html' %}
+{% block title %}
+    Favourites
+{% endblock %}
+{% block body_block %}
+    <div class="container-fluid  pt-4 px-4">
+        <div class="bg-secondary text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Your Favourite Stocks</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="text-white">
+                            <th scope="col">Stock Symbol</th>
+                            <th scope="col">Stock Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for favourite in favourite_list %}
+                            <tr>
+                                <td>{{ favourite.stock.symbol }}</td>
+                                <td>{{ favourite.stock.name }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2">You have no favourite stocks.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -6,6 +6,7 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 
 from accounts.forms import UserProfileForm, UserSignupForm
+from accounts.models import UserProfile
 
 
 # class SignUpView(generic.CreateView):
@@ -37,3 +38,13 @@ class LoginView(LoginView):
     form_class = AuthenticationForm
     success_url = reverse_lazy("django_app:dashboard")
     template_name = "django_app/registration/login.html"
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        response = super().form_valid(form)
+
+        # Ensure the UserProfile instance exists
+        UserProfile.objects.get_or_create(user=self.request.user)
+
+        return response

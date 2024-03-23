@@ -73,6 +73,7 @@
                     <a href="{% url 'django_app:dashboard'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" ><i class="fa fa-home me-2"></i>Dashboard</a>
                     <a href="{% url 'django_app:predict'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'predict' %}active{% endif %}" ><i class="fa fa-search me-2"></i>Prediction</a>
                     <a href="{% url 'django_app:stockInfo'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'stockInfo' %}active{% endif %}"><i class="fa fa-info me-2"></i>Stock Info</a>
+                    <a href="{% url 'django_app:favourites'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'favourites' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>Favourites</a>
                     <a href="{% url 'django_app:news'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>News</a>
                 </div>
 
@@ -95,7 +96,7 @@
                 <div class="navbar-nav align-items-center ms-auto">
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img class="rounded-circle me-lg-2" src="{% static 'django_app/image/user.png' %}" alt="" style="width: 40px; height: 40px;">
+                            <img class="rounded-circle me-lg-2" src="{{ user.profile.avatar.url }}" alt="" style="width: 40px; height: 40px;">
                             {% if user.is_authenticated %}
                                 <span class="d-none d-lg-inline-flex">{{ user.username }}</span>
                             {% else %}
