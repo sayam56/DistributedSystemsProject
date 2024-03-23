@@ -8,6 +8,7 @@ from django.template import RequestContext
 from django.views import View, generic
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import SignupForm
+from .utils import get_news
 from django.contrib.auth import authenticate, login, logout
 
 from plotly.offline import plot
@@ -154,3 +155,9 @@ def login_here(request):
 def logout_here(request):
     logout(request)
     return HttpResponseRedirect(reverse('django_app:dashboard'))
+
+
+# ========================================== News API Section =====================================================
+def news_list(request):
+    news_data = get_news()
+    return render(request, 'django_app/news_API.html', {'news_data': news_data})

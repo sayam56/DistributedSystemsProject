@@ -26,6 +26,7 @@ urlpatterns = [
     path('predict/', views.predict, name='predict'),
     path('stockinfo/', views.stockInfo, name='stockInfo'),
     path('news/', views.news, name='news'),
+    path('news_list/', views.news_list, name='news_api'),
     # path('signup/', SignUpView.as_view(), name='signup'),
     # path('login/', views.login_here, name='login'),
     # path('logout/', views.logout_here, name='logout'),
