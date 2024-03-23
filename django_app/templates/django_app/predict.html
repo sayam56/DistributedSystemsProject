@@ -6,15 +6,17 @@
 {% endblock %}
 
 {% block body_block %}
-    <h2>This is our Prediction page</h2>
-    <div class="container">
-        <header>
-
-        </header>
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-12">
+                <div class="bg-secondary text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Information for {{ ticker_info.Symbol }}</h6>
+                    </div>
 
         <section class="stock-information">
-            <h2>Information for {{ ticker_info.Symbol }}</h2>
-            <table>
+            <div class="table-responsive">
+            <table class="table text-start align-middle table-bordered table-hover mb-0">
                 <!-- Dynamic content from Django context -->
                 <tr>
                     <th>Symbol</th>
@@ -62,25 +64,45 @@
                 </tr>
 
             </table>
-
+            </div>
         </section>
+                    </div>
+            </div>
+        </div>
+    </div>
 
         <section class="stock-charts">
-            <h2>Recent Stock Price of {{ ticker_info.Symbol }}</h2>
-            <div id="live-chart">
+        <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-12">
+                <div class="bg-secondary text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Recent Stock Price of {{ ticker_info.Symbol }}</h6>
+                    </div>
+            <div id="prediction-chart">
                 {{ plot_div_live|safe }}
             </div>
-
-            <h2>Predicted Stock Price of {{ ticker_info.Symbol }} for the next {{ days }} days</h2>
+                     </div>
+            </div>
+        </div>
+    </div>
+        </section>
+        <section class="stock-charts">
+        <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-12">
+                <div class="bg-secondary text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Predicted Stock Price of {{ ticker_info.Symbol }} for the next {{ days }} days</h6>
+                    </div>
             <div id="prediction-chart">
                 {{ plot_div_pred|safe }}
             </div>
-        </section>
-
-        <footer>
-
-        </footer>
+                    </div>
+            </div>
+        </div>
     </div>
+        </section>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
