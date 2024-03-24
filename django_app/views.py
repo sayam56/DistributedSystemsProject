@@ -442,3 +442,19 @@ def stock_prediction_view(request, ticker, days):
     })
     # print(context)
     return render(request, "django_app/predict.html", context)
+
+def predict1(request, ticker, days):
+    ticker_info = ticker
+    days_number = int(days)
+    tickers = pd.read_csv('django_app/Data/Tickers.csv')
+    for i in range(0, tickers.shape[0]):
+        if tickers.Symbol[i] == ticker_info:
+            Symbol = tickers.Symbol[i]
+            Name = tickers.Name[i]
+            break
+    return render(request, "django_app/result.html", context={
+                                                    'ticker_info':ticker_info,
+                                                    'days_number':days_number,
+                                                    'Symbol':Symbol,
+                                                    'Name':Name,
+                                                    })

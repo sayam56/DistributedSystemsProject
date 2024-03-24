@@ -29,5 +29,6 @@ urlpatterns = [
     path('remove_from_favourites/<int:stock_id>/', views.remove_from_favourites, name='remove_from_favourites'),
     path('favourites/', views.favourites, name='favourites'),
     path('search/', views.search, name='search'),
+    path('predict/<str:ticker>/<str:days>/', views.predict, name='predict'),
     path('stock_prediction/<str:ticker>/<int:days>/',views.stock_prediction_view, name='stock_prediction_view'),
 ]
