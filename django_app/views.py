@@ -204,14 +204,6 @@ def remove_from_favourites(request, stock_id):
     return JsonResponse({'success': True})
 
 
-def news(request):
-    response = HttpResponse()
-    heading1 = '<p>' + 'NEWS PAGE:' + '</p>'
-    response.write(heading1)
-
-    return response
-
-
 class SignUpView(generic.CreateView):
     form_class = SignupForm
     success_url = reverse_lazy('django_app/login')  # After signing up, redirect to login page
@@ -266,8 +258,13 @@ def favourites(request):
 
 # News API Section
 def news_list(request):
-    news_data = get_news()
+    user = request.user if request.user.is_authenticated else None
+    news_data = get_news(user)
     return render(request, 'django_app/news_API.html', {'news_data': news_data})
+
+# def news_list(request):
+#     news_data = get_news()
+#     return render(request, 'django_app/news_API.html', {'news_data': news_data})
 
 
 def search(request):
