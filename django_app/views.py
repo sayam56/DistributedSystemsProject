@@ -36,6 +36,8 @@ from .utils import get_news
 
 # Dashboard when Server loads
 def dashboard(request):
+    # Set the session to expire in 20 minutes
+    request.session.set_expiry(1200)
     # Left Card Plot
     # Here we used yf.download function
     data = yf.download(
