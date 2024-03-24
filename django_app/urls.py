@@ -23,7 +23,8 @@ app_name = 'django_app'
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
-    path('predict/', views.predict, name='predict'),
+    path('search/', views.searchView, name='search'),
+    path('predict/<str:ticker>/<str:days>/', views.predict, name='predict'),
     path('stockinfo/', views.stockInfo, name='stockInfo'),
     path('news/', views.news, name='news'),
     path('add_to_favourites/<int:stock_id>/', views.add_to_favourites, name='add_to_favourites'),

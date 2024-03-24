@@ -14,6 +14,7 @@ from .forms import StockSearch, SignupForm
 from django.contrib.auth import authenticate, login, logout
 from .models import Stock, Favourite
 from django.shortcuts import redirect
+from django_app.forms import SearchForm
 
 from plotly.offline import plot
 import plotly.graph_objects as go
@@ -122,13 +123,13 @@ def dashboard(request):
     })
 
 
-@login_required
+"""""@login_required
 def predict(request):
     response = HttpResponse()
     heading1 = '<p>' + 'PREDICT PAGE:' + '</p>'
     response.write(heading1)
 
-    return response
+    return response"""""
 
 
 @login_required
@@ -255,3 +256,42 @@ def favourites(request):
     return render(request, 'django_app/favourites.html', {
         'favourite_list': favourite_stocks
     })
+
+@login_required
+def searchView(request):
+    searched_stock = None
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            searched_stock = form.cleaned_data['TickerName']
+            ticker = form.cleaned_data['TickerName']
+            days = form.cleaned_data['NumberofDays']
+
+            # Check if the number of days is within the valid range
+            if 0 <= days <= 365:
+                # Proceed with valid days
+                return redirect('django_app:predict', ticker=ticker, days=days)
+            else:
+                # Handle invalid days
+                return render(request, 'django_app/Input_Days_Error.html', {'error': "Input days must be between 0 and 365."})
+
+    else:
+        form = SearchForm()
+    return render(request, 'django_app/search.html', {'form': form, 'searched_stock': searched_stock})
+
+@login_required
+def predict(request, ticker, days):
+    ticker_info = ticker
+    days_number = int(days)
+    tickers = pd.read_csv('django_app/Data/Tickers.csv')
+    for i in range(0, tickers.shape[0]):
+        if tickers.Symbol[i] == ticker_info:
+            Symbol = tickers.Symbol[i]
+            Name = tickers.Name[i]
+            break
+    return render(request, "django_app/result.html", context={
+                                                    'ticker_info':ticker_info,
+                                                    'days_number':days_number,
+                                                    'Symbol':Symbol,
+                                                    'Name':Name,
+                                                    })

@@ -1,0 +1,13 @@
+{% extends "django_app/base.html" %}
+
+
+{% block body_block %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Search Stock</button>
+  </form>
+  {% if searched_stock %}
+    <p>Searched stock information: ${{ searched_stock }}</p>
+  {% endif %}
+{% endblock %}

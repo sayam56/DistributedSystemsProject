@@ -13,3 +13,7 @@ class SignupForm(UserCreationForm):
 
 class StockSearch(forms.Form):
     q = forms.CharField(label='', widget=forms.TextInput(attrs={'class': 'form-control me-2', 'type': 'search', 'placeholder': 'Stock Symbol', 'aria-label': 'Search'}))
+
+class SearchForm(forms.Form):
+    TickerName = forms.CharField(max_length=100,required=True)
+    NumberofDays = forms.IntegerField(required=True)

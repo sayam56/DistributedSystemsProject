@@ -1,0 +1,20 @@
+{% extends "django_app/base.html" %}
+
+
+
+{% block body_block %}
+{{ ticker_info }}, {{ days_number }}
+<table>
+                                    <tbody>
+                                        <tr>
+                                            <td>Symbol</td>
+                                            <td>{{Symbol}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Name</td>
+                                            <td>{{Name}}</td>
+                                        </tr>
+                                    </tbody>
+</table>
+</body>
+{% endblock %}
