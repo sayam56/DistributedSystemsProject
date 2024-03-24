@@ -1,0 +1,36 @@
+{% extends 'django_app/base.html' %}
+{% load static %}
+
+{% block title %}
+    News
+{% endblock %}
+
+
+{% block body_block %}
+   <div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-secondary rounded p-4">
+                {% for news_item in news_data.data %}
+                    <div class="card mb-3 bg-inherit">
+                        <div class="row g-0">
+                            <div class="col-md-3">
+                                <img src="{{ news_item.image_url }}" alt="Image" class="img-fluid">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ news_item.title }}</h5>
+                                    <p class="card-text">{{ news_item.description }}</p>
+                                    <p class="card-text"><small class="text-muted">{{ news_item.published_at }}</small></p>
+                                    <a href="{{ news_item.url }}" target="_blank" class="btn btn-success add-to-favourites">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

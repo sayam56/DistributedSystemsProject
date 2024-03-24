@@ -1,0 +1,28 @@
+{% extends 'django_app/base.html' %}
+{% load static %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block body_block %}
+    <div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+    <div class="col-sm-12 col-xl-12">
+                <div class="bg-secondary text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Search Stock</h6>
+                    </div>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success add-to-favourites mt-2">Search Stock</button>
+        </form>
+      {% if searched_stock %}
+        <p>Searched stock information: ${{ searched_stock }}</p>
+      {% endif %}
+                </div>
+    </div>
+    </div>
+    </div>
+{% endblock %}
