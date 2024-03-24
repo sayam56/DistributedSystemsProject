@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template.loader import render_to_string
-import pandas as pd
+
 import json
 from django.urls import reverse_lazy, reverse
 from urllib import request
@@ -22,7 +22,6 @@ from plotly.graph_objs import Scatter
 
 import pandas as pd
 import numpy as np
-import json
 
 import yfinance as yf
 import datetime as dt
@@ -98,7 +97,7 @@ def dashboard(request):
     df6 = yf.download(tickers='GOOGL', period='1d', interval='1d')
     df7 = yf.download(tickers='UBER', period='1d', interval='1d')
     df8 = yf.download(tickers='TSLA', period='1d', interval='1d')
-    # df6 = yf.download(tickers='TWTR', period='1d', interval='1d')
+
 
     df1.insert(0, "Ticker", "AAPL")
     df2.insert(0, "Ticker", "AMZN")
@@ -108,7 +107,7 @@ def dashboard(request):
     df6.insert(0, "Ticker", "GOOGL")
     df7.insert(0, "Ticker", "UBER")
     df8.insert(0, "Ticker", "TSLA")
-    # df6.insert(0, "Ticker", "TWTR")
+
 
     df = pd.concat([df1, df2, df3, df4, df5, df6, df7, df8], axis=0)
     df.reset_index(level=0, inplace=True)
@@ -158,7 +157,7 @@ def stockInfo(request):
         if ticker_df.empty:
             no_results = True
 
-    ticker_list = ticker_df.to_dict('records')  # Convert DataFrame to list of dicts
+    ticker_list = ticker_df.to_dict('records')
 
     # Get the user's favourite stocks
     favourite_stocks = Favourite.objects.filter(user=request.user).values_list('stock_id', flat=True)
@@ -168,16 +167,16 @@ def stockInfo(request):
         i['favourite'] = i['id'] in favourite_stocks
 
     # Set up pagination - 18 rows per page
-    page = request.GET.get('page', 1)  # Get the page number from the request
-    paginator = Paginator(ticker_list, 18)  # Instantiate Paginator with 18 items per page
+    page = request.GET.get('page', 1)
+    paginator = Paginator(ticker_list, 18)
 
     try:
-        tickers = paginator.page(page)  # Get the page of tickers
+        tickers = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
         tickers = paginator.page(1)
     except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
+        # If page is out of range, deliver last page of results.
         tickers = paginator.page(paginator.num_pages)
 
     # Create an instance of the form
@@ -238,12 +237,11 @@ def favourites(request):
     # Get the user's favourite stocks
     favouriteStocks = Favourite.objects.filter(user=request.user).select_related('stock')
 
-    # Set up pagination - 18 rows per page
-    page = request.GET.get('page', 1)  # Get the page number from the request
-    paginator = Paginator(favouriteStocks, 18)  # Instantiate Paginator with 18 items per page
+    page = request.GET.get('page', 1)
+    paginator = Paginator(favouriteStocks, 18)
 
     try:
-        favourite_stocks = paginator.page(page)  # Get the page of tickers
+        favourite_stocks = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
         favourite_stocks = paginator.page(1)
@@ -261,10 +259,6 @@ def news_list(request):
     user = request.user if request.user.is_authenticated else None
     news_data = get_news(user)
     return render(request, 'django_app/news_API.html', {'news_data': news_data})
-
-# def news_list(request):
-#     news_data = get_news()
-#     return render(request, 'django_app/news_API.html', {'news_data': news_data})
 
 
 def search(request):
@@ -411,7 +405,7 @@ def stock_prediction_view(request, ticker, days):
         return render(request, 'django_app/Input_Days_Error.html', {'error': "Input days must be between 0 and 365."})
 
     if not validate_ticker(ticker):
-        return render(request, 'django_app/Ticker_Unfounded.html')
+        return render(request, 'django_app/Ticker_Unfounded.html', {'error': "Please make sure you entered the correct stock SYMBOL."})
 
     df = download_data(ticker)
     if df is None:

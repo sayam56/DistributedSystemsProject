@@ -2,13 +2,22 @@
 {% load static %}
 
 {% block title %}
-    Ticker is Unfounded
+    ERROR!
 {% endblock %}
 
 {% block body_block %}
-<h2>The Ticker is Unfounded!</h2>
-
-<div class="invalid-ticker-images">
-
-</div>
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-12">
+                <div class="bg-secondary text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h3 class="mb-0 align-items-center" style="color: red;">Invalid Stock Name!</h3>
+                    </div>
+                    {% if error %}
+                        <h6 class="d-flex">{{ error }}</h6>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
