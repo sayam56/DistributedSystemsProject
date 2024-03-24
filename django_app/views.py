@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.views import View, generic
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import StockSearch, SignupForm
+from .forms import StockSearch, SignupForm, SearchForm
 from django.contrib.auth import authenticate, login, logout
 from .models import Stock, Favourite
 from django.shortcuts import redirect
@@ -29,6 +29,10 @@ import datetime as dt
 
 from accounts.models import UserProfile
 from .utils import get_news
+
+from sklearn.tree import DecisionTreeRegressor
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
 
 
 # Create your views here.
@@ -260,15 +264,12 @@ def favourites(request):
     })
 
 
-# ========================================== News API Section =====================================================
+# News API Section
 def news_list(request):
     news_data = get_news()
     return render(request, 'django_app/news_API.html', {'news_data': news_data})
 
-#################################################################################################################
-#################################################################################################################
-#################################################################################################################
-from django_app.forms import SearchForm
+
 def search(request):
     searched_stock = None
     if request.method == 'POST':
@@ -283,38 +284,30 @@ def search(request):
                 return redirect('django_app:stock_prediction_view', ticker=ticker, days=days)
             else:
                 # Handle invalid days
-                return render(request, 'django_app/Input_Days_Error.html', {'error': "Input days must be between 0 and 365."})
+                return render(request, 'django_app/Input_Days_Error.html',
+                              {'error': "Input days must be between 0 and 365."})
     else:
         form = SearchForm()
     return render(request, 'django_app/search.html', {'form': form, 'searched_stock': searched_stock})
 
-import pandas as pd
+
 def validate_ticker(ticker_input):
     df = pd.read_csv('django_app/Data/new_tickers.csv')
     symbols_list = df['Symbol'].tolist()
     valid_tickers = symbols_list
-    #tickers are all uppercase
+    # tickers are all uppercase
     ticker_upper_value = ticker_input.upper()
     return ticker_upper_value in valid_tickers
 
 
-import yfinance as yf
-def download_data( ticker_value):
+def download_data(ticker_value):
     try:
-        df=yf.download(tickers=ticker_value,period='1d',interval='1m')
+        df = yf.download(tickers=ticker_value, period='1d', interval='1m')
         print(f"{ticker_value} downloaded")
         return df
     except Exception as e:
-        print(e) #Log error
+        print(e)  # Log error
         return
-
-
-import numpy as np
-from sklearn import preprocessing,model_selection,linear_model
-from sklearn.linear_model import LinearRegression
-import plotly.graph_objects as go
-from plotly.offline import plot
-import datetime as dt
 
 
 def perform_prediction(ticker_value, forecast, last_date):
@@ -350,9 +343,7 @@ def get_ticker_info(ticker_value, csv_path='django_app/Data/Tickers.csv'):
     else:
         return None
 
-from sklearn.tree import DecisionTreeRegressor
-from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
+
 def download_and_prepare_data(ticker_value, period='3mo', interval='1h', number_of_days=30):
     try:
         df = yf.download(tickers=ticker_value, period=period, interval=interval)
@@ -395,6 +386,7 @@ def predict_stock_prices(X_train, X_test, y_train, y_test):
 
     return predictions, score
 
+
 def create_recent_stock_price_chart(dates, closes, ticker_value):
     # Create a Plotly figure
     recent_fig = go.Figure(data=[go.Scatter(x=dates, y=closes, mode='lines+markers')])
@@ -409,6 +401,7 @@ def create_recent_stock_price_chart(dates, closes, ticker_value):
     plot_div_live = plot(recent_fig, auto_open=False, output_type='div')
 
     return plot_div_live
+
 
 def stock_prediction_view(request, ticker, days):
     # Convert days from string to integer
@@ -430,11 +423,11 @@ def stock_prediction_view(request, ticker, days):
     last_date = df.index[-1].strftime('%Y-%m-%d %H:%M:%S')
     dates = df.index.strftime('%Y-%m-%d %H:%M:%S').tolist()
     closes = df['Close'].tolist()
-    #print(dates)
-    #print(closes)
-    context = {'chart_data':json.dumps({'dates': dates, 'closes': closes})}
+    # print(dates)
+    # print(closes)
+    context = {'chart_data': json.dumps({'dates': dates, 'closes': closes})}
     plot_div_live = create_recent_stock_price_chart(dates, closes, ticker)
-    #print(plot_div_live)
+    # print(plot_div_live)
     context.update({'plot_div_live': plot_div_live})
 
     # Prepare data for prediction
@@ -444,17 +437,17 @@ def stock_prediction_view(request, ticker, days):
         predictions, confidence = predict_stock_prices(X_train, X_test, y_train, y_test)
         forecast_prediction = predictions[-input_days:]
 
-        plot_div_pred = perform_prediction(ticker, forecast_prediction,last_date)
+        plot_div_pred = perform_prediction(ticker, forecast_prediction, last_date)
         context.update({'plot_div_pred': plot_div_pred})
     else:
         context.update({'error': "Failed to prepare data for prediction."})
 
     ticker_info = get_ticker_info(ticker)
-    #print(ticker_info)
+    # print(ticker_info)
 
     context.update({
         'ticker_info': ticker_info,
-        'days':days,
+        'days': days,
     })
-    #print(context)
+    # print(context)
     return render(request, "django_app/predict.html", context)

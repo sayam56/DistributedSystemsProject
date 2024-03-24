@@ -23,16 +23,11 @@ app_name = 'django_app'
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
-    path('predict/', views.predict, name='predict'),
     path('stockinfo/', views.stockInfo, name='stockInfo'),
-    path('news/', views.news, name='news'),
+    path('news/', views.news_list, name='news'),
     path('add_to_favourites/<int:stock_id>/', views.add_to_favourites, name='add_to_favourites'),
     path('remove_from_favourites/<int:stock_id>/', views.remove_from_favourites, name='remove_from_favourites'),
     path('favourites/', views.favourites, name='favourites'),
-    path('news_list/', views.news_list, name='news_api'),
-    # path('signup/', SignUpView.as_view(), name='signup'),
-    # path('login/', views.login_here, name='login'),
-    # path('logout/', views.logout_here, name='logout'),
-    path('search/',views.search, name='search'),
+    path('search/', views.search, name='search'),
     path('stock_prediction/<str:ticker>/<int:days>/',views.stock_prediction_view, name='stock_prediction_view'),
 ]

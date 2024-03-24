@@ -53,11 +53,10 @@
                 <div class="d-flex align-items-center ms-4 mb-4">
                     <div class="position-relative">
                         {% if user.is_authenticated %}
-                                <img class="rounded-circle" src="{{ user.profile.avatar.url }}" alt="" style="width: 40px; height: 40px;">
-{#                                <span> {{ user.avatar }}</span>#}
-                            {% else %}
-                                 <img class="rounded-circle" src="{% static 'django_app/image/user.png' %}" alt="" style="width: 40px; height: 40px;">
-                            {% endif %}
+                            <img class="rounded-circle" src="{{ user.profile.avatar.url }}" alt="" style="width: 40px; height: 40px;">
+                        {% else %}
+                             <img class="rounded-circle" src="{% static 'django_app/image/user.png' %}" alt="" style="width: 40px; height: 40px;">
+                        {% endif %}
                         <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
                     </div>
                     <div class="ms-3">
@@ -70,11 +69,17 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="{% url 'django_app:dashboard'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" ><i class="fa fa-home me-2"></i>Dashboard</a>
-                    <a href="{% url 'django_app:search'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'predict' %}active{% endif %}" ><i class="fa fa-search me-2"></i>Prediction</a>
-                    <a href="{% url 'django_app:stockInfo'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'stockInfo' %}active{% endif %}"><i class="fa fa-info me-2"></i>Stock Info</a>
-                    <a href="{% url 'django_app:favourites'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'favourites' %}active{% endif %}"><i class="fa fa-heart me-2"></i>Favourites</a>
-                    <a href="{% url 'django_app:news'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>News</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'django_app:dashboard'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" ><i class="fa fa-home me-2"></i>Dashboard</a>
+                        <a href="{% url 'django_app:search'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'search' %}active{% endif %}" ><i class="fa fa-search me-2"></i>Prediction</a>
+                        <a href="{% url 'django_app:stockInfo'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'stockInfo' %}active{% endif %}"><i class="fa fa-info me-2"></i>Stock Info</a>
+                        <a href="{% url 'django_app:favourites'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'favourites' %}active{% endif %}"><i class="fa fa-heart me-2"></i>Favourites</a>
+                        <a href="{% url 'django_app:news'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>News</a>
+                    {% else %}
+                        <a href="{% url 'django_app:dashboard'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" ><i class="fa fa-home me-2"></i>Dashboard</a>
+                        <a href="{% url 'django_app:news'%}" class="nav-item nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}"><i class="fa fa-list-alt me-2"></i>News</a>
+                    {% endif %}
+
                 </div>
 
             </nav>
@@ -96,10 +101,11 @@
                 <div class="navbar-nav align-items-center ms-auto">
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img class="rounded-circle me-lg-2" src="{{ user.profile.avatar.url }}" alt="" style="width: 40px; height: 40px;">
                             {% if user.is_authenticated %}
+                                <img class="rounded-circle me-lg-2" src="{{ user.profile.avatar.url }}" alt="" style="width: 40px; height: 40px;">
                                 <span class="d-none d-lg-inline-flex">{{ user.username }}</span>
                             {% else %}
+                                <img class="rounded-circle me-lg-2" src="{% static 'django_app/image/user.png' %}" alt="" style="width: 40px; height: 40px;">
                                 <span class="d-none d-lg-inline-flex">Guest</span>
                             {% endif %}
 
@@ -119,19 +125,9 @@
 
             {% block body_block %} *** {% endblock %}
 
-
-            <!-- Widgets End -->
-
-
-            <!-- Footer Start -->
-
-            <!-- Footer End -->
         </div>
         <!-- Content End -->
 
-
-        <!-- Back to Top -->
-{#        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>#}
     </div>
 
     <!-- JavaScript Libraries -->
