@@ -36,8 +36,7 @@ from .utils import get_news
 
 # Dashboard when Server loads
 def dashboard(request):
-    # Set the session to expire in 20 minutes
-    request.session.set_expiry(1200)
+    request.session['views'] = request.session.get('views', 0) + 1
     # Left Card Plot
     # Here we used yf.download function
     data = yf.download(
@@ -121,7 +120,8 @@ def dashboard(request):
     #  Page Render section
     return render(request, 'django_app/dashboard.html', {
         'plot_div_left': plot_div_left,
-        'recent_stocks': recent_stocks
+        'recent_stocks': recent_stocks,
+        'views': request.session['views']
     })
 
 
