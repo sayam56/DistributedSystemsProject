@@ -12,7 +12,13 @@ def get_news(user=None):
     if user is not None:
         favourite_symbols = Favourite.objects.filter(user=user).values_list('stock__symbol', flat=True)
     else:
-        favourite_symbols = 'ONGC, AAPL, GOOGL, META'
+        file = open('Data/Tickers.csv')
+        for line in file:
+            line = line.strip('\n')
+            symbol = line.split(',')[0]
+            random_symbol.append(symbol)
+            favourite_symbols = random.choice(random_symbol)
+        # favourite_symbols = 'ONGC, AAPL, GOOGL, META'
 
     params = {
         'symbols': ','.join(favourite_symbols),
